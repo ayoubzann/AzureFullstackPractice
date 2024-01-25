@@ -1,4 +1,6 @@
+using Azure.Storage.Blobs;
 using AzureFullstackPractice.Data;
+using AzureFullstackPractice.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -12,11 +14,18 @@ builder.Services.AddDbContext<PersonDbContext>(options =>
 builder.Services.AddControllers();
 builder.Services.AddCors(); 
 
+//Step 1
+string connectionString = builder.Configuration.GetConnectionString("zannachiblob");
+builder.Services.AddSingleton<BlobServiceClient>(x => new BlobServiceClient(connectionString));
+builder.Services.AddScoped<BlobStorageService>();
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+                c.OperationFilter<FormFileOperationFilter>();
             });
 
 var app = builder.Build();
@@ -28,12 +37,19 @@ app.UseCors(policy =>
                   .AllowAnyHeader();
         });
 
+app.Use(async (context, next) => 
+{
+    await next.Invoke();
+});
+
 // Configure the HTTP request pipeline.
 app.UseSwagger();
 app.UseSwaggerUI(c =>
        {
            c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
        });
+
+
 
 app.UseHttpsRedirection();
 
