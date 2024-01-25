@@ -15,9 +15,10 @@ public class PersonsController : ControllerBase
     }
 
     [HttpGet("getAll")]
-    public List<Person> GetAll()
+    public ActionResult<List<Person>> GetAll()
     {
-        return _context.Persons.ToList();
+        var result = _context.Persons.ToList();
+        return result;
     }
 
     [HttpPost("add")]
