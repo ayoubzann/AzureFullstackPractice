@@ -1,3 +1,5 @@
+using AzureFullstackPractice.Data;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +13,10 @@ builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
             });
+
+builder.Services.AddDbContext<PersonDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("AzureConn") ??
+     throw new InvalidOperationException("Connection string 'AzureConn' not found.")));
 
 var app = builder.Build();
 
