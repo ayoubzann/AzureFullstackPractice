@@ -14,17 +14,17 @@ public class PersonsController : ControllerBase
         _context = context;
     }
 
-    [HttpGet("getPersons")]
+    [HttpGet("getAll")]
     public List<Person> GetAll()
     {
         return _context.Persons.ToList();
     }
 
-    [HttpPost("addPersons")]
+    [HttpPost("add")]
     public ActionResult<Person> AddPerson(Person person)
     {
         if (person == null) return BadRequest("The person object supplied is invalid. Fill out all fields and try again");
-        
+
         _context.Persons.Add(person);
         return Ok(person);
     }
