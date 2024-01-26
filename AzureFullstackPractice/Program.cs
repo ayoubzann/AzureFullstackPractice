@@ -16,7 +16,7 @@ builder.Services.AddCors();
 
 //Step 1
 string connectionString = builder.Configuration.GetConnectionString("zannachiblob");
-builder.Services.AddSingleton<BlobServiceClient>(x => new BlobServiceClient(connectionString));
+builder.Services.AddScoped<BlobServiceClient>(x => new BlobServiceClient(connectionString));
 builder.Services.AddScoped<BlobStorageService>();
 
 

@@ -25,7 +25,8 @@ public class FormFileOperationFilter : IOperationFilter
                                 {
                                     Type = "string",
                                     Format = "binary"
-                                })
+                                }
+                            )
                         }
                     }
                 }

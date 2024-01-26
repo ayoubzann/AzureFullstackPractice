@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 
 namespace AzureFullstackPractice.Controllers;
-
 [ApiController]
 [Route("[controller]")]
 public class PersonsController : ControllerBase
@@ -18,28 +17,42 @@ public class PersonsController : ControllerBase
     {
         _context = context;
         _client = client;
-
     }
+
+   [HttpGet("download")]
+public async Task<IActionResult> DownloadFile([FromQuery] string containerName, [FromQuery] string blobName)
+{
+    string downloadFilePath = "../Data";
+    try
+    {
+        await _client.DownloadFileAsync(containerName, blobName, downloadFilePath);
+
+        var fileStream = new FileStream(downloadFilePath, FileMode.Open);
+        return File(fileStream, "application/octet-stream", blobName);
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, $"Internal server error: {ex.Message}");
+    }
+}
 
 
     [HttpPost("upload")]
-    public async Task<IActionResult> Upload([FromForm] IFormFile file)
+    public async Task<IActionResult> Upload([FromForm] IFormFile file, string fileName)
     {
         if (file == null || file.Length == 0)
         {
             return BadRequest("No file uploaded.");
         }
-        var tempFilePath = Path.GetTempFileName();
 
-        using (var stream = System.IO.File.Create(tempFilePath))
+        using (var stream = System.IO.File.Create(fileName))
         {
             await file.CopyToAsync(stream);
         }
 
-        await _client.UploadFileAsync("personfullstackblob", tempFilePath);
+        await _client.UploadFileAsync("personfullstackblob", fileName);
         return Ok("File uploaded successfully.");
     }
-
 
     [HttpGet("getAll")]
     public async Task<ActionResult<List<Person>>> GetAll()
@@ -58,7 +71,4 @@ public class PersonsController : ControllerBase
 
         return Ok(person);
     }
-
-
-
 }
